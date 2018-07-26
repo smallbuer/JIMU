@@ -1,121 +1,66 @@
-## JIMU
 
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](https://github.com/luojilab/DDComponentForAndroid/pulls)
-[![License](https://img.shields.io/badge/License-Apache%202.0-orange.svg)](https://github.com/luojilab/DDComponentForAndroid/blob/master/LICENSE) 
-
-### 项目介绍
-JIMU（积木）是一套Android组件化框架，支持组件的代码资源隔离、单独调试、集成调试、组件交互、UI跳转、生命周期等完整功能。
-
-取名为JIMU（积木），其含义是应用这套框架可以做到组件之间的完全隔离，每个组件可以单独运行，同时又可以通过“接口”任意拼接成一个完成APP，这种能力就是我们实施组件化的最终目的。
-
-### 最新版本
-
-[release-note&change-logs](https://github.com/mqzhangw/JIMU/releases) 关注版本变更以及注意事项是个好习惯。
-
-模块|build-gradle|componentlib|router-anno-compiler|router-annotation
----|---|---|---|---
-最新版本|[![Download](https://api.bintray.com/packages/zhmqq0527/compbuild/build-gradle/images/download.svg)](https://bintray.com/zhmqq0527/compbuild/build-gradle/_latestVersion)|[![Download](https://api.bintray.com/packages/zhmqq0527/compbuild/componentlib/images/download.svg)](https://bintray.com/zhmqq0527/compbuild/componentlib/_latestVersion)|[![Download](https://api.bintray.com/packages/zhmqq0527/compbuild/router-anno-compiler/images/download.svg)](https://bintray.com/zhmqq0527/compbuild/router-anno-compiler/_latestVersion)|[![Download](https://api.bintray.com/packages/zhmqq0527/compbuild/router-annotation/images/download.svg)](https://bintray.com/zhmqq0527/compbuild/router-annotation/_latestVersion)
-
-仓库2：
-
-模块|build-gradle|componentlib|router-anno-compiler|router-annotation
----|---|---|---|---
-最新版本|[![Download](https://api.bintray.com/packages/leobert-lan-oss/maven/build-gradle/images/download.svg)](https://api.bintray.com/packages/leobert-lan-oss/maven/build-gradle/_latestVersion)|[![Download](https://api.bintray.com/packages/leobert-lan-oss/maven/componentlib/images/download.svg)](https://bintray.com/leobert-lan-oss/maven/componentlib/_latestVersion)|[![Download](https://api.bintray.com/packages/leobert-lan-oss/maven/router-anno-compiler/images/download.svg)](https://bintray.com/leobert-lan-oss/maven/router-anno-compiler/_latestVersion)|[![Download](https://api.bintray.com/packages/leobert-lan-oss/maven/router-annotation/images/download.svg)](https://bintray.com/leobert-lan-oss/maven/router-annotation/_latestVersion)
-
-*因为没有创建组织账号，可能会发布到不同的仓库，出现版本差异时请关注下release-note*
-
-### 实现功能：
-- 组件可以单独调试
-- 杜绝组件之前相互耦合，代码完全隔离，彻底解耦
-- 组件之间通过接口+实现的方式进行数据传输
-- 使用scheme和host路由的方式进行activity之间的跳转
-- 自动生成路由跳转路由表
-- 任意组件可以充当host，集成其他组件进行集成调试
-- 可以动态对已集成的组件进行加载和卸载
-- 支持kotlin组件
+本分支只是为了解决windows机器使用JIMU框架上遇到的无法删除问题；组件化原理请参考原著：地址：
+https://github.com/mqzhangw/JIMU
 
 
-### 原理解析
-组件化设计思路 [浅谈Android组件化](https://mp.weixin.qq.com/s/RAOjrpie214w0byRndczmg)
+1.windows出现Could not delete path ... app\build\intermediates\transforms\desugar\debug\0.jar错误，根据原因分析得出是Javassist修改类方法时导致Java程序无法释放问题导致的；
 
-原理解释请参考文章[Android彻底组件化方案实践](http://www.jianshu.com/p/1b1d77f58e84)
+2.集合AutoRegister方案，使用效率更高的ASM框架来进行字节码分析和修改，非常感谢作者，原著地址：https://github.com/luckybilly/AutoRegister；
 
-demo解读请参考文章[Android彻底组件化demo发布](http://www.jianshu.com/p/59822a7b2fad)
+3.具体实现步骤：
+1.替换原有项目中com.github.jimu:build-gradle:1.*.*为com.icitic.whdelop:build-gradle:1.0.2，已上传到jcenter仓库；
 
-### 使用指南
-#### 1、主项目引用编译脚本
-在根目录的gradle.properties文件中，增加属性：
+2.在app主module中新建类AppCompCore.class，主要用于AMS修改时找到需要插入注册组件的代码；代码内容如下：
 
-```ini
-mainmodulename=app
+
 ```
-其中mainmodulename是项目中的host工程，一般为app
+package com.luojilab.componentdemo.application;
 
-在根目录的build.gradle中增加配置
+import android.util.Log;
 
-```gradle
-buildscript {
-    dependencies {
-        classpath 'com.github.jimu:build-gradle:A.B.C'
+import com.luojilab.component.componentlib.applicationlike.IApplicationLike;
+
+public class AppCompCore {
+
+    public static void rigisterComp(IApplicationLike iApplicationLike){
+        Log.d("asm---",""+iApplicationLike.getClass().getSimpleName());
+        iApplicationLike.onCreate();
     }
+
+    public static void initComp(){
+
+    }
+
 }
 ```
-*current lastest version 1.3.2 has just post a request to includeed in the bintray's jCenter,maybe you cannot fetch it before the request has been approved*
 
-为每个组件引入依赖库，如果项目中存在basiclib等基础库，可以统一交给basiclib引入
+然后在主module中的build.gradle中添加自动注册的代码；
 
-```gradle
-compile 'com.github.jimu:componentlib:A.B.C'
 ```
+autoregister {
 
-#### 2、拆分组件为module工程
-在每个组件的工程目录下新建文件gradle.properties文件，增加以下配置：
+    registerInfo = [
 
-```ini
-isRunAlone=true
-debugComponent=sharecomponent
-compileComponent=sharecomponent
-```
-上面三个属性分别对应是否单独调试、debug模式下依赖的组件，release模式下依赖的组件。具体使用方式请解释请参见上文第二篇文章
-
-#### 3、应用组件化编译脚本
-在组件和host的build.gradle都增加配置：
-
-```gradle
-apply plugin: 'com.dd.comgradle'
-```
-
-注意：不需要在引用com.android.application或者com.android.library
-
-同时增加以下extension配置：
-
-```gradle
-combuild {
-    applicationName = 'com.luojilab.reader.runalone.application.ReaderApplication'
-    isRegisterCompoAuto = true
+            [
+                    'scanInterface'             : 'com.luojilab.component.componentlib.applicationlike.IApplicationLike'
+                    , 'codeInsertToClassName'   : 'com.luojilab.componentdemo.application.AppCompCore'
+                    , 'codeInsertToMethodName'  : 'initComp' 
+                    , 'registerMethodName'      : 'rigisterComp' 
+            ]
+    ]
 }
 ```
-组件注册还支持反射的方式，有关isRegisterCompoAuto的解释请参见上文第二篇文章
+3.然后删除所有module中的combuild字段；
 
-#### 4、混淆
-在混淆文件中增加如下配置
-```
--keep interface * {
-  <methods>;
-}
--keep class com.luojilab.component.componentlib.** {*;}
--keep class com.luojilab.gen.router.** {*;}
--keep class * implements com.luojilab.component.componentlib.router.ISyringe {*;}
--keep class * implements com.luojilab.component.componentlib.applicationlike.IApplicationLike {*;}
 
 ```
-*注意：com.luojilab.component.componentlib和com.luojilab.gen.router包可能在项目迁移的过程中发生过或即将发生变化，文档更新不一定及时，请手工确认一下生成类的包路径。*
+//combuild {
+//    applicationName = 'com.luojilab.componentdemo.application.AppApplication'
+//    isRegisterCompoAuto = true
+//}
+```
 
-关于如何进行组件之间数据交互和UI跳转，请参看 [Wiki](https://github.com/mqzhangw/JIMU/wiki)
+4.然后编译，在编译过程中会扫描出所有集成IApplicationLike的类，然后在AppCompCore类中initComp方法中动态插入该类的实例并实现rigisterComp方法，所以在编译期就自动执行了组件中的onCreate()方法；
 
-
-### 组件化讨论群
-JIMU的讨论群，群号693097923，欢迎大家加入：
-
-![进群请扫码](https://upload-images.jianshu.io/upload_images/6650461-6adc3ed96ebd8d70.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+5.以上操作只是修改了每一个组件自动注入执行onCreate方法的方式，并不修改其他地方；所以不需要有其他的改动；只是为windows机器无法删除的bug的一种解决方案；
 
