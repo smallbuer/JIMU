@@ -49,10 +49,10 @@ dependencies {
     compile deps.kotlin.kotlin_jdk7
 }
 
-combuild {
-    applicationName = 'com.luojilab.reader.runalone.application.ReaderApplication'
-    isRegisterCompoAuto = false
-}
+//combuild {
+//    applicationName = 'com.luojilab.reader.runalone.application.ReaderApplication'
+//    isRegisterCompoAuto = false
+//}
 repositories {
     mavenCentral()
 }

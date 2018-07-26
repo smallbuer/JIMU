@@ -52,7 +52,20 @@ dependencies {
     annotationProcessor deps.jimu.router_anno_compiler
 }
 
-combuild {
-    applicationName = 'com.luojilab.componentdemo.application.AppApplication'
-    isRegisterCompoAuto = true
+//combuild {
+//    applicationName = 'com.luojilab.componentdemo.application.AppApplication'
+//    isRegisterCompoAuto = true
+//}
+
+autoregister {
+
+    registerInfo = [
+
+            [
+                    'scanInterface'             : 'com.luojilab.component.componentlib.applicationlike.IApplicationLike'
+                    , 'codeInsertToClassName'   : 'com.luojilab.componentdemo.application.AppCompCore'
+                    , 'codeInsertToMethodName'  : 'initComp' //非static方法
+                    , 'registerMethodName'      : 'rigisterComp' //非static方法
+            ]
+    ]
 }
