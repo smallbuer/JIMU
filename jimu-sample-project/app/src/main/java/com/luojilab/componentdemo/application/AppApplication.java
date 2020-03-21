@@ -26,8 +26,10 @@ public class AppApplication extends BaseApplication {
 
         UIRouter.getInstance().registerUI("app");
 
+        AppCompCore.initComp();
+
         //如果isRegisterCompoAuto为false，则需要通过反射加载组件
-        Router.registerComponent("com.luojilab.reader.applike.ReaderAppLike");
+       // Router.registerComponent("com.luojilab.reader.applike.ReaderAppLike");
 //        Router.registerComponent("com.luojilab.share.applike.ShareApplike");
     }
 

@@ -35,14 +35,8 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':componentservice')
-//    kapt project(':router-anno-compiler')
-    kapt 'com.github.jimu:router-anno-compiler:1.0.1'
-    compile deps.kotlin.kotlin_jdk7
+    api fileTree(dir: 'libs', include: ['*.jar'])
+    api project(':componentservice')
+    kapt deps.jimu.router_anno_compiler
+    api deps.kotlin.kotlin_jdk7
 }
-
-//combuild {
-//    applicationName = 'com.luojilab.share.runalone.application.KotlinApplication'
-//    isRegisterCompoAuto = true
-//}

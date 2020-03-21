@@ -5,3 +5,10 @@ include ':app',
         ':componentservice',
         ':basiclib',
         ':basicres'
+
+
+
+
+//include ':buildgradle'
+//project(':buildgradle').projectDir = new File('../jimu-core/build-gradle')
+//

@@ -17,7 +17,6 @@ android {
                 arguments = [host: "app"]
             }
         }
-
         vectorDrawables.useSupportLibrary = true
 
     }
@@ -40,22 +39,16 @@ android {
         // but continue the build even when errors are found:
         abortOnError false
     }
-
-
 }
 
 dependencies {
-    compile project(':componentservice')
-    compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:design:27.0.2'
-    compile 'com.android.support:support-vector-drawable:27.0.2'
+    api project(':componentservice')
+    api 'com.android.support.constraint:constraint-layout:1.0.2'
+    api 'com.android.support:design:27.0.2'
+    api 'com.android.support:support-vector-drawable:27.0.2'
     annotationProcessor deps.jimu.router_anno_compiler
 }
 
-//combuild {
-//    applicationName = 'com.luojilab.componentdemo.application.AppApplication'
-//    isRegisterCompoAuto = true
-//}
 
 autoregister {
 

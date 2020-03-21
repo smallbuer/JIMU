@@ -1,22 +1,27 @@
 package com.dd.buildgradle
 
-import com.dd.buildgradle.exten.ComExtension
+import com.dd.buildgradle.register.AutoRegisterConfig
+import com.dd.buildgradle.register.RegisterTransform
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import com.dd.buildgradle.util.StringUtil
 
 class ComBuild implements Plugin<Project> {
-
+    public static final String EXT_NAME = 'autoregister'
     //默认是app，直接运行assembleRelease的时候，等同于运行app:assembleRelease
     String compilemodule = "app"
 
     void apply(Project project) {
-        project.extensions.create('combuild', ComExtension)
+
+        //project.extensions.create('combuild', ComExtension)
+
+        project.extensions.create(EXT_NAME, AutoRegisterConfig)
 
         String taskNames = project.gradle.startParameter.taskNames.toString()
         System.out.println("taskNames is " + taskNames)
         String module = project.path.replace(":", "")
         System.out.println("current module is " + module)
+
         AssembleTask assembleTask = getTaskInfo(project.gradle.startParameter.taskNames)
 
         if (assembleTask.isAssemble) {
@@ -60,7 +65,26 @@ class ComBuild implements Plugin<Project> {
             System.out.println("apply plugin is " + 'com.android.application')
             if (assembleTask.isAssemble && module.equals(compilemodule)) {
                 compileComponents(assembleTask, project)
-                project.android.registerTransform(new ComCodeTransform(project))
+
+                System.out.println("开始进入ASM----- " + 'com.android.application')
+
+                def transformImpl = new RegisterTransform(project)
+
+                System.out.println("开始进入ASM-----1" + 'com.android.application')
+
+                project.android.registerTransform(transformImpl)
+
+                System.out.println("开始进入ASM-----2" + 'com.android.application')
+
+                project.afterEvaluate {
+
+                    System.out.println("开始进入afterEvaluate-----" + 'com.android.application')
+
+                    init(project, transformImpl)//此处要先于transformImpl.transform方法执行
+                }
+
+                //project.android.registerTransform(new ComCodeTransform(project))
+                //project.android.registerTransform(new Transfer())
             }
         } else {
             project.apply plugin: 'com.android.library'
@@ -68,6 +92,17 @@ class ComBuild implements Plugin<Project> {
         }
 
     }
+
+
+    static void init(Project project, RegisterTransform transformImpl) {
+        AutoRegisterConfig config = project.extensions.findByName(EXT_NAME) as AutoRegisterConfig
+        config.project = project
+        config.convertConfig()
+        transformImpl.config = config
+    }
+
+
+
 
     /**
      * 根据当前的task，获取要运行的组件，规则如下：
@@ -97,8 +132,6 @@ class ComBuild implements Plugin<Project> {
         for (String task : taskNames) {
             if (task.toUpperCase().contains("ASSEMBLE")
                     || task.contains("aR")
-                    || task.contains("asR")
-                    || task.contains("asD")
                     || task.toUpperCase().contains("TINKER")
                     || task.toUpperCase().contains("INSTALL")
                     || task.toUpperCase().contains("RESGUARD")) {
@@ -106,7 +139,6 @@ class ComBuild implements Plugin<Project> {
                     assembleTask.isDebug = true
                 }
                 assembleTask.isAssemble = true
-                System.out.println("debug assembleTask info:"+task)
                 String[] strs = task.split(":")
                 assembleTask.modules.add(strs.length > 1 ? strs[strs.length - 2] : "all")
                 break

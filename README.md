@@ -8,7 +8,7 @@ https://github.com/mqzhangw/JIMU
 2.集合AutoRegister方案，使用效率更高的ASM框架来进行字节码分析和修改，非常感谢作者，原著地址：https://github.com/luckybilly/AutoRegister；
 
 3.具体实现步骤：
-1.替换原有项目中com.github.jimu:build-gradle:1.*.*为com.icitic.whdelop:build-gradle:1.0.2，已上传到jcenter仓库；
+1.替换原有项目中com.github.jimu:build-gradle:1.*.*为com.smallbuer:build-gradle:1.0.5，已上传到jcenter仓库；
 
 2.在app主module中新建类AppCompCore.class，主要用于AMS修改时找到需要插入注册组件的代码；代码内容如下：
 
@@ -63,4 +63,6 @@ autoregister {
 4.然后编译，在编译过程中会扫描出所有集成IApplicationLike的类，然后在AppCompCore类中initComp方法中动态插入该类的实例并实现rigisterComp方法，所以在编译期就自动执行了组件中的onCreate()方法；
 
 5.以上操作只是修改了每一个组件自动注入执行onCreate方法的方式，并不修改其他地方；所以不需要有其他的改动；只是为windows机器无法删除的bug的一种解决方案；
+
+6.继续支持组件的单独打包编译；
 
