@@ -5,7 +5,7 @@ https://github.com/mqzhangw/JIMU
 
 1.windows出现Could not delete path ... app\build\intermediates\transforms\desugar\debug\0.jar错误，根据原因分析得出是Javassist修改类方法时导致Java程序无法释放问题导致的；
 
-2.集合AutoRegister方案，使用效率更高的ASM框架来进行字节码分析和修改，非常感谢作者，原著地址：https://github.com/luckybilly/AutoRegister；
+2.结合AutoRegister方案，使用效率更高的ASM框架来进行字节码分析和修改，非常感谢作者，原著地址：https://github.com/luckybilly/AutoRegister；
 
 3.具体实现步骤：
 1.替换原有项目中com.github.jimu:build-gradle:1.*.*为com.smallbuer:build-gradle:1.0.5，已上传到jcenter仓库；
